@@ -31,37 +31,42 @@ def colorize_image(image):
     lab = cv2.cvtColor(scaled, cv2.COLOR_BGR2LAB)
     L, A, B = cv2.split(lab)
 
-    # Normalize L channel to [0, 1] range for display
+    # Normalize L, A, and B channels for display
     L_normalized = L / 255.0
+    A_normalized = (A - A.min()) / (A.max() - A.min())  # Normalize A to [0, 1]
+    B_normalized = (B - B.min()) / (B.max() - B.min())  # Normalize B to [0, 1]
+
     st.subheader("Step 2: Grayscale Image (L Channel)")
     st.image(L_normalized, channels="GRAY", use_column_width=True)
 
-    # Display A and B channels
     st.subheader("Step 3: A and B Channels")
-    st.image(A / 255.0, channels="GRAY", use_column_width=True, caption="A Channel")  # Normalize for display
-    st.image(B / 255.0, channels="GRAY", use_column_width=True, caption="B Channel")  # Normalize for display
+    st.image(A_normalized, channels="GRAY", use_column_width=True, caption="A Channel")
+    st.image(B_normalized, channels="GRAY", use_column_width=True, caption="B Channel")
 
     # Resize L channel and adjust for model input
     resized_L = cv2.resize(L, (224, 224))
     L_resized = resized_L - 50
+    L_resized = np.clip(L_resized, 0, 255)  # Ensure values are within [0, 255] range
 
     st.subheader("Step 4: Resized L Channel for Model Input")
-    # Ensure L_resized is in [0, 255] range for display
-    L_resized_display = np.clip(L_resized, 0, 255) / 255.0
+    L_resized_display = L_resized / 255.0
     st.image(L_resized_display, channels="GRAY", use_column_width=True)
 
     # Set input for model and process
     net.setInput(cv2.dnn.blobFromImage(L_resized))
     ab = net.forward()[0, :, :, :].transpose((1, 2, 0))
+
+    # Resize predicted AB channels to original image size
     ab_resized = cv2.resize(ab, (image.shape[1], image.shape[0]))
 
     st.subheader("Step 5: Predicted AB Channels")
+    ab_resized = (ab_resized - ab_resized.min()) / (ab_resized.max() - ab_resized.min())  # Normalize to [0, 1]
     ab_image = np.zeros_like(image)
     ab_image[:, :, 1:] = ab_resized
     ab_image = cv2.cvtColor(ab_image, cv2.COLOR_LAB2BGR)
-    ab_image = np.clip(ab_image, 0, 1)  # Ensure values are within [0, 1] for display
     st.image(ab_image, channels="BGR", use_column_width=True)
 
+    # Create final colorized image
     colorized = np.concatenate((L[:, :, np.newaxis], ab_resized), axis=2)
     colorized = cv2.cvtColor(colorized, cv2.COLOR_LAB2BGR)
     colorized = np.clip(colorized, 0, 1)  # Ensure values are within [0, 1] for display
