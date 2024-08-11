@@ -37,25 +37,30 @@ def colorize_image(image):
     st.subheader("Step 2: Grayscale Image (L Channel)")
     st.image(L_normalized, channels="GRAY", use_column_width=True)
 
-    # Display A and B channels
+    # Normalize A and B channels for display
+    A_normalized = cv2.normalize(A, None, 0, 255, cv2.NORM_MINMAX)
+    B_normalized = cv2.normalize(B, None, 0, 255, cv2.NORM_MINMAX)
+
     st.subheader("Step 3: A and B Channels")
-    st.image(A, channels="GRAY", use_column_width=True, caption="A Channel")
-    st.image(B, channels="GRAY", use_column_width=True, caption="B Channel")
+    st.image(A_normalized, channels="GRAY", use_column_width=True, caption="A Channel")
+    st.image(B_normalized, channels="GRAY", use_column_width=True, caption="B Channel")
 
     resized_L = cv2.resize(L, (224, 224))
     L_resized = resized_L - 50
 
     st.subheader("Step 4: Resized L Channel for Model Input")
-    st.image(resized_L / 255.0, channels="GRAY", use_column_width=True)
+    st.image(L_resized / 255.0, channels="GRAY", use_column_width=True)
 
     net.setInput(cv2.dnn.blobFromImage(L_resized))
     ab = net.forward()[0, :, :, :].transpose((1, 2, 0))
     ab_resized = cv2.resize(ab, (image.shape[1], image.shape[0]))
 
     st.subheader("Step 5: Predicted AB Channels")
-    ab_image = cv2.cvtColor(np.zeros_like(image), cv2.COLOR_BGR2LAB)
+    ab_image = np.zeros_like(image)
+    ab_image = cv2.cvtColor(ab_image, cv2.COLOR_BGR2LAB)
     ab_image[:, :, 1:] = ab_resized
-    st.image(ab_image, channels="LAB", use_column_width=True)
+    ab_image_rgb = cv2.cvtColor(ab_image, cv2.COLOR_LAB2BGR)
+    st.image(ab_image_rgb, use_column_width=True, caption="Predicted AB Channels")
 
     colorized = np.concatenate((L[:, :, np.newaxis], ab_resized), axis=2)
     colorized = cv2.cvtColor(colorized, cv2.COLOR_LAB2BGR)
@@ -66,6 +71,7 @@ def colorize_image(image):
     st.image(colorized, use_column_width=True)
 
     return colorized
+
 
 
 def adjust_image(image, brightness=1.0, contrast=1.0, saturation=1.0, gamma=1.0):
