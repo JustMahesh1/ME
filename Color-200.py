@@ -29,26 +29,14 @@ def colorize_image(image):
     # Convert image to float and LAB color space
     scaled = image.astype("float32") / 255.0
     lab = cv2.cvtColor(scaled, cv2.COLOR_BGR2LAB)
-    L, A, B = cv2.split(lab)
-
-    # Normalize L, A, and B channels for display
-    L_normalized = L / 255.0
-    A_normalized = (A - A.min()) / (A.max() - A.min())  # Normalize A to [0, 1]
-    B_normalized = (B - B.min()) / (B.max() - B.min())  # Normalize B to [0, 1]
-
-    st.subheader("Step 2: Grayscale Image (L Channel)")
-    st.image(L_normalized, channels="GRAY", use_column_width=True)
-
-    st.subheader("Step 3: A and B Channels")
-    st.image(A_normalized, channels="GRAY", use_column_width=True, caption="A Channel")
-    st.image(B_normalized, channels="GRAY", use_column_width=True, caption="B Channel")
+    L, _, _ = cv2.split(lab)
 
     # Resize L channel for model input
     resized_L = cv2.resize(L, (224, 224))
     L_resized = resized_L - 50
     L_resized = np.clip(L_resized, 0, 255)  # Ensure values are within [0, 255] range
 
-    st.subheader("Step 4: Resized L Channel for Model Input")
+    st.subheader("Step 2: Resized L Channel for Model Input")
     L_resized_display = L_resized / 255.0
     st.image(L_resized_display, channels="GRAY", use_column_width=True)
 
@@ -70,8 +58,10 @@ def colorize_image(image):
 
     # Convert LAB to BGR
     colorized_bgr = cv2.cvtColor(lab_final, cv2.COLOR_LAB2BGR)
+    colorized_bgr = np.clip(colorized_bgr, 0, 1) * 255  # Ensure pixel values are in [0, 255]
+    colorized_bgr = colorized_bgr.astype(np.uint8)
 
-    st.subheader("Step 5: Final Colorized Image")
+    st.subheader("Step 3: Final Colorized Image")
     st.image(colorized_bgr, use_column_width=True)
 
     return colorized_bgr
