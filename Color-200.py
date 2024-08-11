@@ -29,42 +29,43 @@ def colorize_image(image):
     # Convert image to float and LAB color space
     scaled = image.astype("float32") / 255.0
     lab = cv2.cvtColor(scaled, cv2.COLOR_BGR2LAB)
-    L, _, _ = cv2.split(lab)
+    L, A, B = cv2.split(lab)
 
-    # Resize L channel for model input
+    # Normalize L channel to [0, 1] range for display
+    L_normalized = L / 255.0
+
+    st.subheader("Step 2: Grayscale Image (L Channel)")
+    st.image(L_normalized, channels="GRAY", use_column_width=True)
+
+    # Display A and B channels
+    st.subheader("Step 3: A and B Channels")
+    st.image(A, channels="GRAY", use_column_width=True, caption="A Channel")
+    st.image(B, channels="GRAY", use_column_width=True, caption="B Channel")
+
     resized_L = cv2.resize(L, (224, 224))
     L_resized = resized_L - 50
-    L_resized = np.clip(L_resized, 0, 255)  # Ensure values are within [0, 255] range
 
-    st.subheader("Step 2: Resized L Channel for Model Input")
-    L_resized_display = L_resized / 255.0
-    st.image(L_resized_display, channels="GRAY", use_column_width=True)
+    st.subheader("Step 4: Resized L Channel for Model Input")
+    st.image(resized_L / 255.0, channels="GRAY", use_column_width=True)
 
-    # Set input for model and process
     net.setInput(cv2.dnn.blobFromImage(L_resized))
     ab = net.forward()[0, :, :, :].transpose((1, 2, 0))
-
-    # Resize predicted AB channels to original image size
     ab_resized = cv2.resize(ab, (image.shape[1], image.shape[0]))
 
-    # Normalize and clip the predicted AB channels
-    ab_resized_normalized = (ab_resized - ab_resized.min()) / (ab_resized.max() - ab_resized.min())  # Normalize to [0, 1]
-    ab_resized_clipped = np.clip(ab_resized_normalized, 0, 1)  # Ensure values are within [0, 1]
+    st.subheader("Step 5: Predicted AB Channels")
+    ab_image = cv2.cvtColor(np.zeros_like(image), cv2.COLOR_BGR2LAB)
+    ab_image[:, :, 1:] = ab_resized
+    st.image(ab_image, channels="LAB", use_column_width=True)
 
-    # Create final LAB image
-    lab_final = np.zeros((image.shape[0], image.shape[1], 3), dtype=np.float32)
-    lab_final[:, :, 0] = L  # Set L channel
-    lab_final[:, :, 1:] = ab_resized_clipped  # Set AB channels
+    colorized = np.concatenate((L[:, :, np.newaxis], ab_resized), axis=2)
+    colorized = cv2.cvtColor(colorized, cv2.COLOR_LAB2BGR)
+    colorized = np.clip(colorized, 0, 1)
+    colorized = (255 * colorized).astype("uint8")
 
-    # Convert LAB to BGR
-    colorized_bgr = cv2.cvtColor(lab_final, cv2.COLOR_LAB2BGR)
-    colorized_bgr = np.clip(colorized_bgr, 0, 1) * 255  # Ensure pixel values are in [0, 255]
-    colorized_bgr = colorized_bgr.astype(np.uint8)
+    st.subheader("Step 6: Final Colorized Image")
+    st.image(colorized, use_column_width=True)
 
-    st.subheader("Step 3: Final Colorized Image")
-    st.image(colorized_bgr, use_column_width=True)
-
-    return colorized_bgr
+    return colorized
 
 
 def adjust_image(image, brightness=1.0, contrast=1.0, saturation=1.0, gamma=1.0):
