@@ -39,28 +39,30 @@ def colorize_image(image):
 
     # Display A and B channels
     st.subheader("Step 3: A and B Channels")
-    st.image(A, channels="GRAY", use_column_width=True, caption="A Channel")
-    st.image(B, channels="GRAY", use_column_width=True, caption="B Channel")
+    st.image(A / 255.0, channels="GRAY", use_column_width=True, caption="A Channel")  # Normalize for display
+    st.image(B / 255.0, channels="GRAY", use_column_width=True, caption="B Channel")  # Normalize for display
 
     resized_L = cv2.resize(L, (224, 224))
     L_resized = resized_L - 50
 
     st.subheader("Step 4: Resized L Channel for Model Input")
-    st.image(resized_L / 255.0, channels="GRAY", use_column_width=True)
+    st.image(L_resized / 255.0, channels="GRAY", use_column_width=True)
 
     net.setInput(cv2.dnn.blobFromImage(L_resized))
     ab = net.forward()[0, :, :, :].transpose((1, 2, 0))
     ab_resized = cv2.resize(ab, (image.shape[1], image.shape[0]))
 
     st.subheader("Step 5: Predicted AB Channels")
-    ab_image = cv2.cvtColor(np.zeros_like(image), cv2.COLOR_BGR2LAB)
+    ab_image = np.zeros_like(image)
     ab_image[:, :, 1:] = ab_resized
-    st.image(ab_image, channels="LAB", use_column_width=True)
+    ab_image = cv2.cvtColor(ab_image, cv2.COLOR_LAB2BGR)
+    ab_image = np.clip(ab_image, 0, 1)  # Ensure values are within [0, 1] for display
+    st.image(ab_image, channels="BGR", use_column_width=True)
 
     colorized = np.concatenate((L[:, :, np.newaxis], ab_resized), axis=2)
     colorized = cv2.cvtColor(colorized, cv2.COLOR_LAB2BGR)
-    colorized = np.clip(colorized, 0, 1)
-    colorized = (255 * colorized).astype("uint8")
+    colorized = np.clip(colorized, 0, 1)  # Ensure values are within [0, 1] for display
+    colorized = (255 * colorized).astype("uint8")  # Convert to uint8 for display
 
     st.subheader("Step 6: Final Colorized Image")
     st.image(colorized, use_column_width=True)
