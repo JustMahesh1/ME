@@ -69,7 +69,7 @@ def colorize_image(image):
     st.image(ab_image, channels="LAB", use_column_width=True)
 
     # Create final colorized image
-    colorized = np.concatenate((L[:, :, np.newaxis], ab_resized), axis=2)
+    colorized = np.concatenate((L[:, :, np.newaxis], ab), axis=2)
     colorized = cv2.cvtColor(colorized, cv2.COLOR_LAB2BGR)
     colorized = np.clip(colorized, 0, 1)
     colorized = (255 * colorized).astype("uint8")
