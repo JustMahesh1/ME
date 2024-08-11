@@ -59,15 +59,18 @@ def colorize_image(image):
     # Resize predicted AB channels to original image size
     ab_resized = cv2.resize(ab, (image.shape[1], image.shape[0]))
 
+    # Normalize and clip the predicted AB channels
+    ab_resized_normalized = (ab_resized - ab_resized.min()) / (ab_resized.max() - ab_resized.min())  # Normalize to [0, 1]
+    ab_resized_clipped = np.clip(ab_resized_normalized, 0, 1)  # Ensure values are within [0, 1]
+
     st.subheader("Step 5: Predicted AB Channels")
-    ab_resized = (ab_resized - ab_resized.min()) / (ab_resized.max() - ab_resized.min())  # Normalize to [0, 1]
-    ab_image = np.zeros_like(image)
-    ab_image[:, :, 1:] = ab_resized
-    ab_image = cv2.cvtColor(ab_image, cv2.COLOR_LAB2BGR)
+    ab_image = np.zeros((image.shape[0], image.shape[1], 3), dtype=np.float32)
+    ab_image[:, :, 1:] = ab_resized_clipped  # Assign AB channels
+    ab_image = cv2.cvtColor(ab_image, cv2.COLOR_LAB2BGR)  # Convert LAB to BGR for display
     st.image(ab_image, channels="BGR", use_column_width=True)
 
     # Create final colorized image
-    colorized = np.concatenate((L[:, :, np.newaxis], ab_resized), axis=2)
+    colorized = np.concatenate((L[:, :, np.newaxis], ab_resized_clipped), axis=2)
     colorized = cv2.cvtColor(colorized, cv2.COLOR_LAB2BGR)
     colorized = np.clip(colorized, 0, 1)  # Ensure values are within [0, 1] for display
     colorized = (255 * colorized).astype("uint8")  # Convert to uint8 for display
