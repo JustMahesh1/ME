@@ -33,7 +33,6 @@ def colorize_image(image):
 
     # Normalize L channel to [0, 1] range for display
     L_normalized = L / 255.0
-
     st.subheader("Step 2: Grayscale Image (L Channel)")
     st.image(L_normalized, channels="GRAY", use_column_width=True)
 
@@ -42,12 +41,16 @@ def colorize_image(image):
     st.image(A / 255.0, channels="GRAY", use_column_width=True, caption="A Channel")  # Normalize for display
     st.image(B / 255.0, channels="GRAY", use_column_width=True, caption="B Channel")  # Normalize for display
 
+    # Resize L channel and adjust for model input
     resized_L = cv2.resize(L, (224, 224))
     L_resized = resized_L - 50
 
     st.subheader("Step 4: Resized L Channel for Model Input")
-    st.image(L_resized / 255.0, channels="GRAY", use_column_width=True)
+    # Ensure L_resized is in [0, 255] range for display
+    L_resized_display = np.clip(L_resized, 0, 255) / 255.0
+    st.image(L_resized_display, channels="GRAY", use_column_width=True)
 
+    # Set input for model and process
     net.setInput(cv2.dnn.blobFromImage(L_resized))
     ab = net.forward()[0, :, :, :].transpose((1, 2, 0))
     ab_resized = cv2.resize(ab, (image.shape[1], image.shape[0]))
