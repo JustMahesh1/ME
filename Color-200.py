@@ -43,7 +43,7 @@ def colorize_image(image):
     st.image(A_normalized, channels="GRAY", use_column_width=True, caption="A Channel")
     st.image(B_normalized, channels="GRAY", use_column_width=True, caption="B Channel")
 
-    # Resize L channel and adjust for model input
+    # Resize L channel for model input
     resized_L = cv2.resize(L, (224, 224))
     L_resized = resized_L - 50
     L_resized = np.clip(L_resized, 0, 255)  # Ensure values are within [0, 255] range
@@ -63,19 +63,19 @@ def colorize_image(image):
     ab_resized_normalized = (ab_resized - ab_resized.min()) / (ab_resized.max() - ab_resized.min())  # Normalize to [0, 1]
     ab_resized_clipped = np.clip(ab_resized_normalized, 0, 1)  # Ensure values are within [0, 1]
 
-    st.subheader("Step 5: Predicted AB Channels")
-    ab_image = cv2.cvtColor(np.zeros_like(image), cv2.COLOR_BGR2LAB)
-    ab_image[:, :, 1:] = ab_resized
-    st.image(ab_image, channels="LAB", use_column_width=True)
+    # Create final LAB image
+    lab_final = np.zeros((image.shape[0], image.shape[1], 3), dtype=np.float32)
+    lab_final[:, :, 0] = L  # Set L channel
+    lab_final[:, :, 1:] = ab_resized_clipped  # Set AB channels
 
-    # Create final colorized image
-    colorized = np.concatenate((L[:, :, np.newaxis], ab_resized_clipped), axis=2)
-    colorized_bgr = cv2.cvtColor(colorized, cv2.COLOR_LAB2BGR)
+    # Convert LAB to BGR
+    colorized_bgr = cv2.cvtColor(lab_final, cv2.COLOR_LAB2BGR)
 
-    st.subheader("Step 6: Final Colorized Image")
-    st.image(colorized, use_column_width=True)
+    st.subheader("Step 5: Final Colorized Image")
+    st.image(colorized_bgr, use_column_width=True)
 
-    return colorized
+    return colorized_bgr
+
 
 def adjust_image(image, brightness=1.0, contrast=1.0, saturation=1.0, gamma=1.0):
     img = cv2.convertScaleAbs(image, alpha=contrast, beta=brightness)
