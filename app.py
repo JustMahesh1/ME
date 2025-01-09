@@ -7,7 +7,7 @@ import datetime
 
 # Set page configuration with favicon and layout settings
 st.set_page_config(
-    page_title="Colorizer App",
+    page_title="Color Revive",
     page_icon="color-revive.ico",  # Add a favicon or path to an image file
     layout="wide",
     initial_sidebar_state="expanded"
