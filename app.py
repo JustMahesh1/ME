@@ -104,7 +104,7 @@ def render_sidebar():
         # Display history if available
         if st.session_state.history:
             for idx, (image, timestamp) in enumerate(st.session_state.history):
-                st.image(image, use_column_width=True, caption=f"Image {idx + 1} - Uploaded at {timestamp}")
+                st.image(image, use_container_width=True, caption=f"Image {idx + 1} - Uploaded at {timestamp}")
         else:
             st.write("No history available. Upload an image to start.")
 
