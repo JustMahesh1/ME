@@ -78,11 +78,11 @@ def render_sidebar():
 
     # About Button with link redirection
     if st.sidebar.button("About"):
-        st.write("[Go to About](https://instagram.com/just_mahesh_75)")  # Replace with actual link
+        st.sidebar.markdown("[Go to About](https://instagram.com/just_mahesh_75)")  # Replace with actual link
 
     # Contact Button with link redirection
     if st.sidebar.button("Contact"):
-        st.write("[Go to Contact Page](https://example.com/contact)")  # Replace with actual link
+        st.sidebar.markdown("[Go to Contact Page](https://example.com/contact)")  # Replace with actual link
 
     help_expander = st.sidebar.expander("Help")
     with help_expander:
