@@ -74,7 +74,7 @@ def render_sidebar():
 
     # Home Button
     if st.sidebar.button("Home"):
-        st.experimental_rerun()  # This will rerun the app
+        st.sidebar.write("You are on the **Home** page.")
 
     # About Button with link redirection
     if st.sidebar.button("About"):
