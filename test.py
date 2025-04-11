@@ -105,9 +105,9 @@ def render_sidebar():
                 try:
                     if isinstance(image, (str, bytes)):
                         img = Image.open(image)
-                        st.image(img, use_column_width=True, caption=f"Image {idx + 1} - {timestamp}")
+                        st.image(img, use_container_width=True, caption=f"Image {idx + 1} - {timestamp}")
                     else:
-                        st.image(image, use_column_width=True, caption=f"Image {idx + 1} - {timestamp}")
+                        st.image(image, use_container_width=True, caption=f"Image {idx + 1} - {timestamp}")
                 except Exception as e:
                     st.error(f"Error loading image {idx + 1}: {str(e)}")
         else:
