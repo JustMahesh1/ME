@@ -571,7 +571,7 @@ def show_home():
     <div class="title-card">
         <h1 style="color: white; margin: 0; font-size: 1.8rem; font-weight: 700; letter-spacing: 0.5px;">ColorRevive</h1>
         <p style="color: rgba(255,255,255,0.8); margin: 0.5rem 0 0; font-size: 1rem; font-weight: 400;">
-        Bring monochrome memories to life
+        Colorize B/W Images
         </p>
     </div>
     """, unsafe_allow_html=True)
