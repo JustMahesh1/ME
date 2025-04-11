@@ -488,7 +488,7 @@ def show_contact():
 
             cols = st.columns(2)
             with cols[0]:
-                name = st.text_input("Your Name", placeholder="John Doe", key="name")
+                name = st.text_input("Your Name", placeholder="Full Name", key="name")
                 email = st.text_input("Your Email", placeholder="your@email.com", key="email")
             with cols[1]:
                 subject = st.selectbox(
@@ -520,7 +520,7 @@ def show_contact():
     st.markdown("""
     <div class="reach-card">
         <h4>📧 Reach Us Directly</h4>
-        <p><strong>Email:</strong> <a href="mailto:support@colorizeapp.com" style="color:#AEDDFF;">support@colorizeapp.com</a></p>
+        <p><strong>Email:</strong> <a href="mailto:support@colorizeapp.com" style="color:#AEDDFF;">mahesh2122003@gmail.com.com</a></p>
         <p>We’d love to hear your feedback or help with any questions you have!</p>
     </div>
     """, unsafe_allow_html=True)
