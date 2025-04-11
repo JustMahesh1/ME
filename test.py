@@ -293,7 +293,7 @@ def show_about():
         <h2>🎨 About Our Colorizer</h2>
         <p>
             Our colorizer technology transforms black and white images into vibrant color photographs  
-            by leveraging the LAB color space — a color model designed to approximate human vision.
+            by leveraging the LAB color space.
         </p>
     </div>
     """, unsafe_allow_html=True)
