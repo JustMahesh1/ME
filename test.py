@@ -394,6 +394,14 @@ def show_about():
         st.session_state.current_page = "home"
         st.rerun()
 
+    # Footer
+    st.markdown("""
+	<div style="display: flex; justify-content: center; align-items: center; width: 100%;>
+    <div class="footer" >
+        <p>© 2025 U Mahesh </p>
+    </div> </div>
+    """, unsafe_allow_html=True)
+
 
 
 def show_contact():
@@ -527,9 +535,10 @@ def show_contact():
 
     # Footer
     st.markdown("""
-    <div class="footer">
-        <p>© 2025 U Mahesh | All Rights Reserved</p>
-    </div>
+	<div style="display: flex; justify-content: center; align-items: center; width: 100%;>
+    <div class="footer" >
+        <p>© 2025 U Mahesh </p>
+    </div> </div>
     """, unsafe_allow_html=True)
 
 
@@ -641,6 +650,14 @@ def show_home():
 	  
         </div>
         """, unsafe_allow_html=True)
+
+    # Footer
+    st.markdown("""
+	<div style="display: flex; justify-content: center; align-items: center; width: 100%;>
+    <div class="footer" >
+        <p>© 2025 U Mahesh </p>
+    </div> </div>
+    """, unsafe_allow_html=True)
 
 # App Router
 def main():
